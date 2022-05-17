@@ -1,8 +1,13 @@
 import os
 import requests
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+from mongo_client import mongo_client
 
+gallery = mongo_client.gallery
+images_collection = gallery.images
+#     test_collection = db.test_collection
+#     res = test_collection.insert_one({"name": "John", "student": True})
 
 UNSPLASH_URL = "https://api.unsplash.com/photos/random"
 UNSPALSH_KEY = os.environ.get("UNSPLASH_KEY", "")
@@ -28,6 +33,21 @@ def new_image():
 
     data = response.json()
     return data
+
+
+@app.route("/images", methods=["GET", "POST"])
+def images():
+    if request.method == "GET":
+        # read images from the database
+        images = images_collection.find({})
+        return jsonify([img for img in images])
+    if request.method == "POST":
+        # save image in the database
+        image = request.get_json()
+        image["_id"] = image.get("id")
+        result = images_collection.insert_one(image)
+        inserted_id = result.inserted_id
+        return {"inserted_id": inserted_id}
 
 
 if __name__ == "__main__":
