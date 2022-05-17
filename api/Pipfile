@@ -9,6 +9,7 @@ requests = "*"
 python-dotenv = "*"
 flask-cors = "*"
 jinja2 = "*"
+pymongo = "*"
 
 [dev-packages]
 black = "*"
